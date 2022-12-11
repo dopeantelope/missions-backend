@@ -1,22 +1,30 @@
-const express = require('express')
-const app = express()
-const mongoose = require('mongoose')
-const connectDB = require('./config/db')
-const logger = require('morgan')
+var cors = require('cors');
+const express = require('express'); 
+const app = express(); 
+const http = require('http'); 
+const server = http.createServer(app); 
+const socketio = require("socket.io"); 
+const logger = require('morgan') 
 
-require("dotenv").config({ path: './config/.env' })
+app.use(cors()); 
+let io = socketio(server,{ cors: { origin: '*', methods: ['GET', 'POST'] } }); 
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+//const mongoose = require('mongoose') 
+//const connectDB = require('./config/db') 
+// connectDB() 
 
-connectDB()
+require("dotenv").config({ path: "./config/.env" })
 
-app.get('/', (req, res) => {
-  res.send('hi')
-})
+app.get('/', (req, res) => { 
+  res.send('hello world'); 
+});
 
 app.use(logger("dev"))
 
-app.listen(process.env.PORT, () => {
-  console.log("Server is running, you better catch it!");
+io.on('connection', client => { 
+  console.log('a user connected');
+}); 
+
+server.listen(process.env.PORT, () => { 
+  console.log(`Server is listening on port ${process.env.PORT}`); 
 });
