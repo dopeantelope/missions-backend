@@ -29,6 +29,27 @@ app.get('/', (req, res) => {
 
 io.on('connection', client => { 
   console.log('a user connected');
+
+
+io.on('connection', client => { 
+  console.log('a user connected');
+
+  client.on('newGame', handleNewGame);
+
+  function handleNewGame() {
+    console.log("in new game method")
+    let roomName = "myRoom";
+    clientRooms[client.id] = roomName;
+    client.emit('gameCode', roomName);
+
+   // state[roomName] = initGame();
+
+    client.join(roomName);
+    client.emit('gameCode', roomName)
+    //client.number = 1;
+    //client.emit('init', 1);
+  }
+}); 
 }); 
 
 server.listen(process.env.PORT, () => { 
