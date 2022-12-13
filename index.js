@@ -30,7 +30,9 @@ app.get('/', (req, res) => {
   res.send('hello world'); 
 });
 
-io.on('connection', client => { 
+io.on('connection', client => {
+  client.id = 'dopeantelope'
+  console.log(client.id)
   console.log('a user connected');
 
   client.on('newGame', handleNewGame);
