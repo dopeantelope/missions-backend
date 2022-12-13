@@ -7,6 +7,8 @@ const socketio = require("socket.io");
 const logger = require('morgan')
 const mongoose = require('mongoose')
 const connectDB = require('./config/db') 
+const clientRooms = {};
+
 
 
 require("dotenv").config({ path: "./config/.env" })
@@ -16,10 +18,10 @@ app.use(cors());
 let io = socketio(server,{ cors: { origin: '*', methods: ['GET', 'POST'] } }); 
 
 //mongoose deprecation preparation
-mongoose.set('strictQuery', false);
+//mongoose.set('strictQuery', false);
 
 //connect to database
-connectDB();
+//connectDB();
 
 app.use(logger("dev"))
 
@@ -30,26 +32,42 @@ app.get('/', (req, res) => {
 io.on('connection', client => { 
   console.log('a user connected');
 
-
-io.on('connection', client => { 
-  console.log('a user connected');
-
   client.on('newGame', handleNewGame);
+  client.on('joinGame', handleJoinGame);
+
 
   function handleNewGame() {
     console.log("in new game method")
     let roomName = "myRoom";
     clientRooms[client.id] = roomName;
-    client.emit('gameCode', roomName);
 
-   // state[roomName] = initGame();
 
     client.join(roomName);
-    client.emit('gameCode', roomName)
-    //client.number = 1;
-    //client.emit('init', 1);
+    client.emit('getGameCode', roomName)
   }
-}); 
+
+  function handleJoinGame(roomName) {
+    console.log("in handle join game method")
+    const room = io.sockets.adapter.rooms[roomName];
+    console.log(room)
+
+    let allUsers;
+    if (room) {
+      allUsers = room.sockets;
+    }
+    let numClients = 0;
+    if (allUsers) {
+      numClients = Object.keys(allUsers).length;
+    }
+
+    if (numClients === 0) {
+      client.emit('unknownCode');
+      return;
+    } 
+    clientRooms[client.id] = roomName;
+
+    client.join(roomName);
+  }
 }); 
 
 server.listen(process.env.PORT, () => { 
