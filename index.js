@@ -7,9 +7,7 @@ const socketio = require("socket.io");
 const logger = require('morgan')
 const mongoose = require('mongoose')
 const connectDB = require('./config/db') 
-const clientRooms = {};
-
-
+const { addUser, getUser, deleteUser, getUsers } = require('./users')
 
 require("dotenv").config({ path: "./config/.env" })
 
@@ -29,47 +27,25 @@ app.use(logger("dev"))
 app.get('/', (req, res) => { 
   res.send('hello world'); 
 });
+io.on('connection', socket => {
+  let room = generateRoomCode();
 
-io.on('connection', client => {
-  client.id = 'dopeantelope'
-  console.log(client.id)
-  console.log('a user connected');
+  socket.on('newGame', ( {username} ) => {
+    console.log(username)
+    const { user } = addUser(socket.id, username, room)
+    socket.join(user.room)
+    console.log(`${user.username} just entered the room ${room} `)
+    socket.emit('getGameCode', room)
 
-  client.on('newGame', handleNewGame);
-  client.on('joinGame', handleJoinGame);
-
-
-  function handleNewGame() {
-    console.log("in new game method")
-    let roomName = generateRoomCode();
-    clientRooms[client.id] = roomName;
+})
 
 
-    client.join(roomName);
-    client.emit('getGameCode', roomName)
-  }
+  socket.on('joinGame', handleJoinGame);
 
-  function handleJoinGame(roomName) {
+  function handleJoinGame() {
     console.log("in handle join game method")
-    const room = io.sockets.adapter.rooms[roomName];
-    console.log(room)
-
-    let allUsers;
-    if (room) {
-      allUsers = room.sockets;
-    }
-    let numClients = 0;
-    if (allUsers) {
-      numClients = Object.keys(allUsers).length;
-    }
-
-    if (numClients === 0) {
-      client.emit('unknownCode');
-      return;
-    } 
-    clientRooms[client.id] = roomName;
-
-    client.join(roomName);
+    const rooms = io.sockets.adapter.rooms;
+    console.log(rooms)
   }
 }); 
 
