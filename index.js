@@ -1,4 +1,4 @@
-var cors = require('cors');
+const cors = require('cors');
 const express = require('express'); 
 const app = express(); 
 const http = require('http'); 
@@ -14,8 +14,9 @@ const clientRooms = {};
 require("dotenv").config({ path: "./config/.env" })
 
 
-app.use(cors()); 
-let io = socketio(server,{ cors: { origin: '*', methods: ['GET', 'POST'] } }); 
+app.use(cors());
+
+let io = socketio(server, { cors: { origin: '*', methods: ['GET', 'POST'] } }); 
 
 //mongoose deprecation preparation
 //mongoose.set('strictQuery', false);
@@ -38,7 +39,7 @@ io.on('connection', client => {
 
   function handleNewGame() {
     console.log("in new game method")
-    let roomName = "myRoom";
+    let roomName = generateRoomCode();
     clientRooms[client.id] = roomName;
 
 
@@ -69,6 +70,16 @@ io.on('connection', client => {
     client.join(roomName);
   }
 }); 
+
+
+const generateRoomCode = () => {
+  let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let str = '';
+  for (let i = 0; i < 4; i++) {
+      str += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return str;
+};
 
 server.listen(process.env.PORT, () => { 
   console.log(`Server is listening on port ${process.env.PORT}`); 
