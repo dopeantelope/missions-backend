@@ -27,27 +27,32 @@ app.use(logger("dev"))
 app.get('/', (req, res) => { 
   res.send('hello world'); 
 });
+
+
+//socketio
+
 io.on('connection', socket => {
   let room = generateRoomCode();
 
-  socket.on('newGame', ( {username} ) => {
-    console.log(username)
+  socket.on('newGame', ({ username }) => {
     const { user } = addUser(socket.id, username, room)
     socket.join(user.room)
-    console.log(`${user.username} just entered the room ${room} `)
+    console.log(`${user.username} has created and joined room: ${room} `)
     socket.emit('getGameCode', room)
+  })
 
-})
-
-
-  socket.on('joinGame', handleJoinGame);
-
-  function handleJoinGame() {
+  socket.on('joinGame', ( {username, room} ) => {
     console.log("in handle join game method")
+    const { user } = addUser(socket.id, username, room)
+    socket.join(user.room)
     const rooms = io.sockets.adapter.rooms;
     console.log(rooms)
-  }
+    console.log('GAME CODE     ' + room)
+    console.log(`${user.username} has joined room: ${room} `)
+    socket.emit('getGameCode', room)
+  });
 }); 
+
 
 
 const generateRoomCode = () => {
