@@ -50,6 +50,8 @@ io.on('connection', socket => {
     console.log('GAME CODE     ' + room)
     console.log(`${user.username} has joined room: ${room} `)
     socket.emit('getGameCode', room)
+    console.log(getUsers(room))
+    socket.emit('getConnectedUsers', getUsers(room))
   });
 }); 
 
