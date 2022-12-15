@@ -34,11 +34,16 @@ app.get('/', (req, res) => {
 io.on('connection', socket => {
   let room = generateRoomCode();
 
+  
+
   socket.on('newGame', ({ username }) => {
     const { user } = addUser(socket.id, username, room)
     socket.join(user.room)
     console.log(`${user.username} has created and joined room: ${room} `)
     socket.emit('getGameCode', room)
+    io.in(room).emit('usersList', getUsers(room))
+
+
   })
 
   socket.on('joinGame', ( {username, room} ) => {
@@ -50,9 +55,11 @@ io.on('connection', socket => {
     console.log('GAME CODE     ' + room)
     console.log(`${user.username} has joined room: ${room} `)
     socket.emit('getGameCode', room)
-    console.log(getUsers(room))
-    socket.emit('getConnectedUsers', getUsers(room))
+    io.in(room).emit('usersList', getUsers(room))
+
   });
+
+
 }); 
 
 
