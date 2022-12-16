@@ -6,8 +6,10 @@ const server = http.createServer(app);
 const socketio = require("socket.io"); 
 const logger = require('morgan')
 const mongoose = require('mongoose')
-const connectDB = require('./config/db') 
+const connectDB = require('./config/db')
 const { addUser, getUser, deleteUser, getUsers } = require('./users')
+// const missionRoutes = require("./routers/missions");
+const Missions = require("./models/Missions");
 
 require("dotenv").config({ path: "./config/.env" })
 
@@ -40,6 +42,7 @@ io.on('connection', socket => {
     const { user } = addUser(socket.id, username, room)
     socket.join(user.room)
     socket.emit('getGameCode', room)
+    getMissions()
     io.in(room).emit('usersList', getUsers(room))
 
 
@@ -57,6 +60,18 @@ io.on('connection', socket => {
 
 }); 
 
+async function getMissions() {
+    try {
+      const mission = await Missions.find()
+      console.log(mission)
+
+    } catch (err) {
+      console.log(err);
+    }
+}
+
+
+// app.use("/missions", missionRoutes);
 
 
 const generateRoomCode = () => {
