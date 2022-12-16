@@ -17,10 +17,10 @@ app.use(cors());
 let io = socketio(server, { cors: { origin: '*', methods: ['GET', 'POST'] } }); 
 
 //mongoose deprecation preparation
-//mongoose.set('strictQuery', false);
+mongoose.set('strictQuery', false);
 
 //connect to database
-//connectDB();
+connectDB();
 
 app.use(logger("dev"))
 
@@ -39,7 +39,6 @@ io.on('connection', socket => {
   socket.on('newGame', ({ username }) => {
     const { user } = addUser(socket.id, username, room)
     socket.join(user.room)
-    console.log(`${user.username} has created and joined room: ${room} `)
     socket.emit('getGameCode', room)
     io.in(room).emit('usersList', getUsers(room))
 
@@ -47,13 +46,9 @@ io.on('connection', socket => {
   })
 
   socket.on('joinGame', ( {username, room} ) => {
-    console.log("in handle join game method")
     const { user } = addUser(socket.id, username, room)
     socket.join(user.room)
     const rooms = io.sockets.adapter.rooms;
-    console.log(rooms)
-    console.log('GAME CODE     ' + room)
-    console.log(`${user.username} has joined room: ${room} `)
     socket.emit('getGameCode', room)
     io.in(room).emit('usersList', getUsers(room))
 
