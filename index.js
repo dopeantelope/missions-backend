@@ -7,9 +7,7 @@ const socketio = require("socket.io");
 const logger = require('morgan')
 const mongoose = require('mongoose')
 const connectDB = require('./config/db') 
-const clientRooms = {};
-
-
+const { addUser, getUser, deleteUser, getUsers } = require('./users')
 
 require("dotenv").config({ path: "./config/.env" })
 
@@ -19,10 +17,10 @@ app.use(cors());
 let io = socketio(server, { cors: { origin: '*', methods: ['GET', 'POST'] } }); 
 
 //mongoose deprecation preparation
-//mongoose.set('strictQuery', false);
+mongoose.set('strictQuery', false);
 
 //connect to database
-//connectDB();
+connectDB();
 
 app.use(logger("dev"))
 
@@ -30,48 +28,35 @@ app.get('/', (req, res) => {
   res.send('hello world'); 
 });
 
-io.on('connection', client => {
-  client.id = 'dopeantelope'
-  console.log(client.id)
-  console.log('a user connected');
 
-  client.on('newGame', handleNewGame);
-  client.on('joinGame', handleJoinGame);
+//socketio
+
+io.on('connection', socket => {
+  let room = generateRoomCode();
+
+  
+
+  socket.on('newGame', ({ username }) => {
+    const { user } = addUser(socket.id, username, room)
+    socket.join(user.room)
+    socket.emit('getGameCode', room)
+    io.in(room).emit('usersList', getUsers(room))
 
 
-  function handleNewGame() {
-    console.log("in new game method")
-    let roomName = generateRoomCode();
-    clientRooms[client.id] = roomName;
+  })
+
+  socket.on('joinGame', ( {username, room} ) => {
+    const { user } = addUser(socket.id, username, room)
+    socket.join(user.room)
+    const rooms = io.sockets.adapter.rooms;
+    socket.emit('getGameCode', room)
+    io.in(room).emit('usersList', getUsers(room))
+
+  });
 
 
-    client.join(roomName);
-    client.emit('getGameCode', roomName)
-  }
-
-  function handleJoinGame(roomName) {
-    console.log("in handle join game method")
-    const room = io.sockets.adapter.rooms[roomName];
-    console.log(room)
-
-    let allUsers;
-    if (room) {
-      allUsers = room.sockets;
-    }
-    let numClients = 0;
-    if (allUsers) {
-      numClients = Object.keys(allUsers).length;
-    }
-
-    if (numClients === 0) {
-      client.emit('unknownCode');
-      return;
-    } 
-    clientRooms[client.id] = roomName;
-
-    client.join(roomName);
-  }
 }); 
+
 
 
 const generateRoomCode = () => {
