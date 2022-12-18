@@ -57,6 +57,10 @@ io.on('connection', socket => {
 
   });
 
+  socket.on('startGame', ({ username, room, missions}) => {
+    console.log('start game')
+  })
+
 
 }); 
 
