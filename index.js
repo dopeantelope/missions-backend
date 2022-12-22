@@ -7,9 +7,11 @@ const socketio = require("socket.io");
 const logger = require('morgan')
 const mongoose = require('mongoose')
 const connectDB = require('./config/db')
-const { addUser, getUser, deleteUser, getUsers } = require('./users')
-const missionRoutes = require("./routers/missions");
+const { addUser, getUser, deleteUser, getUsers, addMissionsToUser } = require('./users')
+// const missionRoutes = require("./routers/missions");
 const Missions = require("./models/Missions");
+const getMissions = require("./missions")
+
 
 require("dotenv").config({ path: "./config/.env" })
 
@@ -34,15 +36,14 @@ app.get('/', (req, res) => {
 //socketio
 
 io.on('connection', socket => {
-  let room = generateRoomCode();
-
-  
+  let room
 
   socket.on('newGame', ({ username }) => {
-    const { user } = addUser(socket.id, username, room)
+    room = generateRoomCode();
+    const { user } = addUser(socket.id, username, room, [])
     socket.join(user.room)
     socket.emit('getGameCode', room)
-    getMissions()
+    addMissionsToUser(socket.id)
     io.in(room).emit('usersList', getUsers(room))
 
 
@@ -57,24 +58,12 @@ io.on('connection', socket => {
 
   });
 
-  socket.on('startGame', ({ username, room, missions}) => {
-    getMissions()
+  socket.on('startGame', () => {
+    getMissions(room)
   })
 
 
 }); 
-
-async function getMissions() {
-    try {
-      const mission = await Missions.find()
-            console.log("hereß")
-
-      console.log(mission)
-
-    } catch (err) {
-      console.log(err);
-    }
-}
 
 
 // app.use("/missions", missionRoutes);

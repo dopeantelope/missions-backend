@@ -1,6 +1,6 @@
 const users = []
 
-const addUser = (id, username, room) => {
+const addUser = (id, username, room, missions) => {
     const existingUser = users.find(user => user.username.trim().toLowerCase() === username.trim().toLowerCase())
 
     // if (existingUser) return { error: "Username has already been taken" }
@@ -8,7 +8,7 @@ const addUser = (id, username, room) => {
     // if (!username) return { error: "Username is required" }
     // if (!room) return { error: "Room is required" }
 
-    const user = { id, username, room }
+    const user = { id, username, room, missions }
     users.push(user)
     return { user }
 }
@@ -23,10 +23,12 @@ const deleteUser = (id) => {
     if (index !== -1) return users.splice(index, 1)[0];
 }
 
-const addMissionToUser = (id) => {
-
+const addMissionsToUser = (id, missions) => {
+    let user = users.find(user => user.id == id)
+    // user.missions = {mission: }
+    
 }
 
 const getUsers = (room) => users.filter(user => user.room === room)
 
-module.exports = { addUser, getUser, deleteUser, getUsers }
+module.exports = { addUser, getUser, deleteUser, getUsers, addMissionsToUser, users }
