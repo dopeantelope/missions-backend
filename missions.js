@@ -24,23 +24,36 @@ function randomizeCorrectNumberOfMissions(missions, room) {
       i--
     }
   } 
-  allocateMissions(randomizedMissions)
+  allocateMissions(randomizedMissions, room)
 }
 
-function allocateMissions(randomizedMissions) {
-  let allMissions = []
-  let sixMissions = []
+function allocateMissions(randomizedMissions, room) {
+  let users = getUsers(room)
 
-  for (let i = 0; i < randomizedMissions.length; i++) {
-    if (sixMissions.length < 6) {
-      sixMissions.push(randomizedMissions[i])
-    } else {
-      allMissions.push(sixMissions)
-      sixMissions = []
-    }
+  for (let i = 0; i < users.length; i++) {
+    users[i].missions = randomizedMissions.splice(0, 6)
   }
 
-  console.log(allMissions)
+  console.log(users)
+
+
+
+
+
+
+  // let userMissions = []
+
+  // console.log(randomizedMissions.length)
+
+  // for (let i = 0; i < randomizedMissions.length; i++) {
+  //   if (userMissions.length < 6) {
+  //     userMissions.push(randomizedMissions[i])
+  //   } else {
+  //     console.log('push usermissions to user')
+  //     userMissions = []
+  //   }
+  // }
+  // console.log(userMissions)
 }
 
 

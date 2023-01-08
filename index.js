@@ -33,8 +33,6 @@ app.get('/', (req, res) => {
 });
 
 
-//socketio
-
 io.on('connection', socket => {
   let room
 
