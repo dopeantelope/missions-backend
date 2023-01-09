@@ -7,7 +7,7 @@ const socketio = require("socket.io");
 const logger = require('morgan')
 const mongoose = require('mongoose')
 const connectDB = require('./config/db')
-const { addUser, getUser, deleteUser, getUsers, addMissionsToUser } = require('./users')
+const { addUser, getUser, deleteUser, getUsers } = require('./users')
 // const missionRoutes = require("./routers/missions");
 const Missions = require("./models/Missions");
 const getMissions = require("./missions")
@@ -34,11 +34,12 @@ app.get('/', (req, res) => {
 
 
 io.on('connection', socket => {
-  let room
+  let room, host
 
   socket.on('newGame', ({ username }) => {
     room = generateRoomCode();
     const { user } = addUser(socket.id, username, room, [])
+    host = socket.id
     socket.join(user.room)
     socket.emit('getGameCode', room)
     addMissionsToUser(socket.id)
