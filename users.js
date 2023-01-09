@@ -23,12 +23,7 @@ const deleteUser = (id) => {
     if (index !== -1) return users.splice(index, 1)[0];
 }
 
-const addMissionsToUser = (id, missions) => {
-    let user = users.find(user => user.id == id)
-    // user.missions = {mission: }
-    
-}
 
 const getUsers = (room) => users.filter(user => user.room === room)
 
-module.exports = { addUser, getUser, deleteUser, getUsers, addMissionsToUser, users }
+module.exports = { addUser, getUser, deleteUser, getUsers, users }

@@ -36,24 +36,6 @@ function allocateMissions(randomizedMissions, room) {
 
   console.log(users)
 
-
-
-
-
-
-  // let userMissions = []
-
-  // console.log(randomizedMissions.length)
-
-  // for (let i = 0; i < randomizedMissions.length; i++) {
-  //   if (userMissions.length < 6) {
-  //     userMissions.push(randomizedMissions[i])
-  //   } else {
-  //     console.log('push usermissions to user')
-  //     userMissions = []
-  //   }
-  // }
-  // console.log(userMissions)
 }
 
 
