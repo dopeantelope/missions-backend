@@ -51,8 +51,7 @@ io.on('connection', socket => {
   socket.on('joinGame', ( {username, room} ) => {
     const { user } = addUser(socket.id, username, room)
     socket.join(user.room)
-    const rooms = io.sockets.adapter.rooms;
-    socket.emit('getGameCode', room)
+    socket.emit('getGameCode', ({room,host}))
     io.in(room).emit('usersList', getUsers(room))
 
   });
