@@ -10,7 +10,7 @@ const connectDB = require('./config/db')
 const { addUser, getUser, deleteUser, getUsers } = require('./users')
 // const missionRoutes = require("./routers/missions");
 const Missions = require("./models/Missions");
-const getMissions = require("./missions")
+const {getMissions, randomizeCorrectNumberOfMissions, allocateMissions} = require("./missions")
 
 
 require("dotenv").config({ path: "./config/.env" })
@@ -41,9 +41,9 @@ io.on('connection', socket => {
     const { user } = addUser(socket.id, username, room, [])
     host = socket.id
     socket.join(user.room)
-    socket.emit('getGameCode', room)
-    addMissionsToUser(socket.id)
-    io.in(room).emit('usersList', getUsers(room))
+    socket.emit('getGameCode', ({room, host}))
+    let userRoom = getUsers(room)
+    io.in(room).emit('usersList', (userRoom))
 
 
   })
@@ -51,8 +51,7 @@ io.on('connection', socket => {
   socket.on('joinGame', ( {username, room} ) => {
     const { user } = addUser(socket.id, username, room)
     socket.join(user.room)
-    const rooms = io.sockets.adapter.rooms;
-    socket.emit('getGameCode', room)
+    socket.emit('getGameCode', ({room, host}))
     io.in(room).emit('usersList', getUsers(room))
 
   });

@@ -39,4 +39,4 @@ function allocateMissions(randomizedMissions, room) {
 }
 
 
-module.exports = getMissions
+module.exports = {getMissions, randomizeCorrectNumberOfMissions, allocateMissions}
