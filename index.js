@@ -41,7 +41,7 @@ io.on('connection', socket => {
     const { user } = addUser(socket.id, username, room, [])
     host = socket.id
     socket.join(user.room)
-    socket.emit('getGameCode', ({room,host}))
+    socket.emit('getGameCode', ({room, host}))
     let userRoom = getUsers(room)
     io.in(room).emit('usersList', (userRoom))
 
@@ -51,7 +51,7 @@ io.on('connection', socket => {
   socket.on('joinGame', ( {username, room} ) => {
     const { user } = addUser(socket.id, username, room)
     socket.join(user.room)
-    socket.emit('getGameCode', ({room,host}))
+    socket.emit('getGameCode', ({room, host}))
     io.in(room).emit('usersList', getUsers(room))
 
   });
