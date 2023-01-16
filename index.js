@@ -10,7 +10,7 @@ const connectDB = require('./config/db')
 const { addUser, getUser, deleteUser, getUsers } = require('./users')
 // const missionRoutes = require("./routers/missions");
 const Missions = require("./models/Missions");
-const {getMissions, randomizeCorrectNumberOfMissions, allocateMissions} = require("./missions")
+const {getMissions} = require("./missions")
 
 
 require("dotenv").config({ path: "./config/.env" })
@@ -56,10 +56,11 @@ io.on('connection', socket => {
 
   });
 
-  socket.on('startGame', () => {
-    getMissions(room)
-  })
-
+  socket.on('startGame', async ()  => {
+    await getMissions(room)
+    let user = getUser(socket.id)
+    socket.emit('getMissions', user)
+});
 
 }); 
 
