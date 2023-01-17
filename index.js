@@ -59,8 +59,9 @@ io.on('connection', socket => {
   socket.on('startGame', async ()  => {
     await getMissions(room)
     let user = getUser(socket.id)
-    socket.emit('getMissions', user)
-});
+    socket.to(room).emit('redirect',user)
+    io.in(room).emit('getMissions', user)
+  });
 
 }); 
 
